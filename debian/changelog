@@ -1,3 +1,51 @@
+os-prober (1.81) unstable; urgency=medium
+
+  * Team upload
+
+  [ Pascal Hambourg ]
+  * Add Windows 11 detection.
+
+ -- Holger Wansing <hwansing@mailbox.org>  Mon, 18 Jul 2022 14:32:39 +0200
+
+os-prober (1.80) unstable; urgency=medium
+
+  * Team upload
+
+  [ Samuel Thibault ]
+  * control: Enable mount dependency only on linux, enable freebsd-utils on
+    kfreebsd instead. (Closes: #1006590)
+
+  [ General Chaos ]
+  * Handle multiple initrd paths, as used in some distros
+
+  [ Gaël PORTAY ]
+  * Fix "os-prober: call dmraid -r *once*".
+
+  [ Timo Gurr ]
+  * Add Exherbo Linux detection (Closes: #755804)
+
+  [ Pascal Hambourg ]
+  * Sort Linux kernels in reverse version order if no boot loader config file
+    found (Closes: #741889)
+
+  [ Sergei Galkin ]
+  * Add ntfs3 for 5.15 kernel.
+
+  [ rakslice ]
+  * detect alpine initramfs files
+
+  [ Luke Shumaker ]
+  * Fall back to looking for /usr/lib/os-release.
+
+  [ Debian Janitor ]
+  * Bump debhelper from deprecated 9 to 13.
+  * Set debhelper-compat version in Build-Depends.
+  * Remove constraints unnecessary since buster:
+    + Build-Depends: Drop versioned constraint on dpkg-dev.
+    + os-prober-udeb: Drop versioned constraint on anna in Depends.
+
+ -- Holger Wansing <hwansing@mailbox.org>  Thu, 26 May 2022 23:16:53 +0200
+
 os-prober (1.79) unstable; urgency=medium
 
   * Team upload
