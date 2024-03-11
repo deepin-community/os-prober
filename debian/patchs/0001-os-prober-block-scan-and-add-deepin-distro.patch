@@ -1,0 +1,49 @@
+From 9b99ef5a01d149b31a69f79b3b887c22b571dc2f Mon Sep 17 00:00:00 2001
+From: xzl <xiangzelong@deepin.org>
+Date: Mon, 11 Mar 2024 11:17:57 +0800
+Subject: [PATCH 1/1] os-prober-block-scan-and-add-deepin-distro
+
+---
+ os-probes/mounted/common/90linux-distro | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/os-probes/mounted/common/90linux-distro b/os-probes/mounted/common/90linux-distro
+index 69db679..a5c50e9 100755
+--- a/os-probes/mounted/common/90linux-distro
++++ b/os-probes/mounted/common/90linux-distro
+@@ -17,7 +17,7 @@ type="$3"
+ # symlinks we need to also check in $dir/usr/lib* for distributions that
+ # moved /lib* to /usr and only left symlinks behind.
+ # TODO: look for ld-linux.so on arches that have it
+-if (ls "$dir"/lib*/ld*.so* && [ -d "$dir/boot" ] || ls "$dir"/usr/lib*/ld*.so*) >/dev/null 2>/dev/null; then
++#if (ls "$dir"/lib*/ld*.so* && [ -d "$dir/boot" ] || ls "$dir"/usr/lib*/ld*.so*) >/dev/null 2>/dev/null; then
+ 	if [ -e "$dir/etc/os-release" ]; then
+ 		short="$(grep ^NAME= "$dir/etc/os-release" | sed 's/^[^=]*=//; s/^['\''"]\(.*\)['\''"]$/\1/; s/\\\(.\)/\1/g; s/[[:space:]].*//')"
+ 		long="$(grep ^PRETTY_NAME= "$dir/etc/os-release" | sed 's/^[^=]*=//; s/^['\''"]\(.*\)['\''"]$/\1/; s/\\\(.\)/\1/g')"
+@@ -143,14 +143,17 @@ if (ls "$dir"/lib*/ld*.so* && [ -d "$dir/boot" ] || ls "$dir"/usr/lib*/ld*.so*)
+ 	elif [ -e "$dir/etc/exherbo-release" ]; then
+ 		short="Exherbo"
+ 		long="Exherbo Linux"
++	elif [ -e "$dir/etc/deepin_version" ]; then
++		short="deepin"
++		long="$(printf "deepin GNU/Linux (%s)\n" "$(cat "$dir/etc/deepin_version")")"
+ 	else
+-		short="Linux"
+-		long="unknown Linux distribution"
++		exit 1
++		# short="Linux"
++		# long="unknown Linux distribution"
+ 	fi
+-	
+         label="$(count_next_label "$short")"
+ 	result "$partition:$long:$label:linux"
+ 	exit 0
+-else
+-	exit 1
+-fi
++# else
++# 	exit 1
++#fi
+-- 
+2.43.0
+

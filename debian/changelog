@@ -1,3 +1,10 @@
+os-prober (1.81-0deepin1) unstable; urgency=medium
+
+  * Change package to 3.0(quilt)
+  * Add deepin patch to support deepin distro and block scan
+
+ -- xiangzelong  <xiangzelong@deepin.org>  Mon, 11 Mar 2024 11:26:25
+
 os-prober (1.81) unstable; urgency=medium
 
   * Team upload
