@@ -19,7 +19,7 @@ for kernpat in /vmlinuz /vmlinux /boot/vmlinuz /boot/vmlinux "/boot/vmlinuz*" \
 	else
 		kernbootpart="$partition"
 	fi
-	for kernfile in $(eval ls "$mpoint$kernpat" 2>/dev/null); do
+	for kernfile in $(eval ls -vr "$mpoint$kernpat" 2>/dev/null); do
 		kernbasefile=$(echo "$kernfile" | sed "s!^$mpoint!!")
 		if [ -f "$kernfile" ] && [ ! -L "$kernfile" ]; then
 			initrdname=$(echo "$kernfile" | sed "s/vmlinu[zx]/initrd\*/")
@@ -34,8 +34,10 @@ for kernpat in /vmlinuz /vmlinux /boot/vmlinuz /boot/vmlinux "/boot/vmlinuz*" \
 			initrdname3=$(echo "$kernfile" | sed "s/vmlinu[zx]/initramfs\*/" | sed 's/$/.img/')
 			# And Gentoo's also
 			initrdname4=$(echo "$kernfile" | sed "s/kernel/initramfs\*/")
+			# Also Alpine
+			initrdname5=$(echo "$kernfile" | sed "s/vmlinu[zx]/initramfs\*/")
 			foundinitrd=0
-			for initrd in $(eval ls "$initrdname" "$initrdname1" "$initrdname2" "$initrdname3" "$initrdname4" 2>/dev/null); do
+			for initrd in $(eval ls "$initrdname" "$initrdname1" "$initrdname2" "$initrdname3" "$initrdname4" "$initrdname5" 2>/dev/null); do
 				if [ "$initrd" != "$kernfile" ] && [ -f "$initrd" ] && [ ! -L "$initrd" ]; then
 					initrd=$(echo "$initrd" | sed "s!^$mpoint!!")
 					result "$partition:$kernbootpart::$kernbasefile:$initrd:root=$mappedpartition"
