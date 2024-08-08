@@ -7,6 +7,12 @@ partition="$1"
 mpoint="$2"
 type="$3"
 
+# this function interleaves a string with dots, thus:
+#   "Windows 11" --> "W.i.n.d.o.w.s. .1.1"
+dotify() {
+	echo $1 | sed 's/./&./g;s/.$//'
+}
+
 # This script looks for legacy BIOS bootloaders only. Skip if running UEFI
 if [ -d /sys/firmware/efi ] && [ ! -f /var/lib/partman/ignore_uefi ]; then
 	debug "Skipping legacy bootloaders on UEFI system"
@@ -15,7 +21,7 @@ fi
 
 # Weed out stuff that doesn't apply to us
 case "$type" in
-	ntfs|ntfs-3g) debug "$1 is a NTFS partition" ;;
+	ntfs3|ntfs|ntfs-3g) debug "$1 is a NTFS partition" ;;
 	vfat) debug "$1 is a FAT32 partition" ;;
 	msdos) debug "$1 is a FAT16 partition" ;;
 	fat) debug "$1 is a FAT partition (mounted by GRUB)" ;;
@@ -31,29 +37,20 @@ if item_in_dir -q bootmgr "$2"; then
 	for boot in $(item_in_dir boot "$2"); do
 		bcd=$(item_in_dir bcd "$2/$boot")
 		if [ -n "$bcd" ]; then
-			if   grep -aqs "W.i.n.d.o.w.s. .1.0" "$2/$boot/$bcd"; then
-				long="Windows 10"
-			elif grep -aqs "W.i.n.d.o.w.s. .8" "$2/$boot/$bcd"; then
-				long="Windows 8"
-			elif grep -aqs "W.i.n.d.o.w.s. .7" "$2/$boot/$bcd"; then
-				long="Windows 7"
-			elif grep -aqs "W.i.n.d.o.w.s. .V.i.s.t.a" "$2/$boot/$bcd"; then
-				long="Windows Vista"
-			elif grep -aqs "W.i.n.d.o.w.s. .S.e.r.v.e.r. .2.0.0.8. .R.2." "$2/$boot/$bcd"; then
-				long="Windows Server 2008 R2"
-			elif grep -aqs "W.i.n.d.o.w.s. .S.e.r.v.e.r. .2.0.0.8." "$2/$boot/$bcd"; then
-				long="Windows Server 2008"
-			elif grep -aqs "W.i.n.d.o.w.s. .R.e.c.o.v.e.r.y. .E.n.v.i.r.o.n.m.e.n.t" "$2/$boot/$bcd"; then
-				long="Windows Recovery Environment"
-			elif grep -aqs "W.i.n.d.o.w.s. .S.e.t.u.p" "$2/$boot/$bcd"; then
-				long="Windows Recovery Environment"
-			else
-				long="Windows Vista"
-			fi
+			found=true
 			short=Windows
 
-			found=true
-
+			for v in 12 11 10 8 7 Vista "Server 2008 R2" "Server 2008" "Recovery Environment" "Setup"; do
+				win_v="Windows $v"
+				if grep -aqs "$(dotify "$win_v")" "$2/$boot/$bcd"; then
+					long="$win_v"
+					# Windows Setup is a special case, rename it:
+					[ "$v" != "Setup" ] || long="Windows Recovery Environment"
+					break
+				fi
+			done
+			# if no match found, call it Vista
+			: ${long:="Windows Vista"}
 			break
 		fi
 	done
