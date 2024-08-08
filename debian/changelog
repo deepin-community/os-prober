@@ -1,4 +1,4 @@
-os-prober (1.82-0deepin1) unstable; urgency=medium
+os-prober (1.82+deepin1) unstable; urgency=medium
 
   * loong64: filter out non-EFI-stub (old-world) kernels.
   * loong64: chainload old-world GRUB2 when non-EFI-stub kernels exist in a
