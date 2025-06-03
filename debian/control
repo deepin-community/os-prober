@@ -11,7 +11,7 @@ Vcs-Git: https://salsa.debian.org/installer-team/os-prober.git
 Package: os-prober-udeb
 Package-Type: udeb
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, di-utils-mapdevfs, anna, grub-mount-udeb [linux-any kfreebsd-any]
+Depends: ${misc:Depends}, ${shlibs:Depends}, di-utils-mapdevfs, anna, grub-mount-udeb [!sw64 linux-any kfreebsd-any]
 Provides: os-prober
 Description: utility to detect other OSes on a set of drives
  This package is to be used by boot loader installers to detect other OSes
@@ -21,7 +21,7 @@ Description: utility to detect other OSes on a set of drives
 Package: os-prober
 Architecture: any
 Section: utils
-Depends: ${shlibs:Depends}, ${misc:Depends}, grub-common [linux-any kfreebsd-any], mount [linux-any], freebsd-utils [kfreebsd-any]
+Depends: ${shlibs:Depends}, ${misc:Depends}, grub-common [!sw64 linux-any kfreebsd-any], mount [linux-any], freebsd-utils [kfreebsd-any]
 Description: utility to detect other OSes on a set of drives
  This package detects other OSes available on a system and outputs the
  results in a generic machine-readable format.

@@ -1,3 +1,9 @@
+os-prober (1.82+deepin2) unstable; urgency=medium
+
+  * feat: add sw64 support.
+
+ -- hudeng <hudeng@deepin.org>  Tue, 03 Jun 2025 21:20:52 +0800
+
 os-prober (1.82+deepin1) unstable; urgency=medium
 
   * loong64: filter out non-EFI-stub (old-world) kernels.
