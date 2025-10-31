@@ -1,3 +1,9 @@
+os-prober (1.82+deepin3) unstable; urgency=medium
+
+  * Fix incorrect system version information retrieved from mounted disks.
+
+ -- xinpeng.wang <wangxinpeng@uniontech.com>  Fri, 31 Oct 2025 11:42:56 +0800
+
 os-prober (1.82+deepin2) unstable; urgency=medium
 
   * feat: add sw64 support.
