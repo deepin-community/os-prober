@@ -1,0 +1,32 @@
+Index: deepin-os-prober/os-prober
+===================================================================
+--- deepin-os-prober.orig/os-prober	2025-10-31 11:28:54.138808288 +0800
++++ deepin-os-prober/os-prober	2025-10-31 11:42:38.873689779 +0800
+@@ -161,6 +161,27 @@
+ 	else
+ 		mpoint=$(grep "^$mapped " "$OS_PROBER_TMP/mounted-map" | head -n1 | cut -d " " -f 2)
+ 		mpoint="$(unescape_mount "$mpoint")"
++
++		# This resolves the issue of incorrect system version information retrieved from mounted disks.
++		# The problem stems from symbolic links within mounted partitions pointing to the local root
++		# directory, leading to incorrect version readings. Treating these disks as unmounted and
++		# remounting them using `grub-mount` resolves the issue, resulting in the correct version
++		# information.
++		if [ -n "$OS_PROBER_NEWNS" ] && { [ "${mpoint#/mnt/}" != "$mpoint" ] || [ "${mpoint#/media/}" != "$mpoint" ]; }; then
++        	debug "using unmounted detection for newns partition: $partition at $mpoint"
++
++        	for test in /usr/lib/os-probes/*; do
++            	if [ -f "$test" ] && [ -x "$test" ]; then
++                	debug "running $test on $partition (newns safe mode)"
++                	if "$test" "$partition"; then
++                    	debug "os detected by $test"
++                    	break
++                	fi
++            	fi
++        	done
++			continue
++		fi
++
+ 		if [ "$mpoint" != "/target/boot" ] && [ "$mpoint" != "/target" ] && [ "$mpoint" != "/" ]; then
+ 			type=$(grep "^$mapped " "$OS_PROBER_TMP/mounted-map" | head -n1 | cut -d " " -f 3)
+ 			for test in /usr/lib/os-probes/mounted/*; do
