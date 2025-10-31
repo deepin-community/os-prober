@@ -1,0 +1,55 @@
+#!/bin/sh
+# Locate old-world GRUB2 boot files for chainloading.
+
+. /usr/share/os-prober/common.sh
+
+set -e
+
+partition="$1"
+bootpart="$2"
+mpoint="$3"
+type="$4"
+
+
+exitcode=1
+# In mounted/common/90fallback, we used is_efi_stub to detect non-PE
+# (non-EFI-stub) kernel images to see if the kernel belongs to an old-world
+# system.
+#
+# With LoongArch, the old-world firmware expects to boot from an ELF-formatted
+# kernel image (vmlinu{x,z}), whereas new-world firmware expects PE-formatted
+# EFI stub kernels (vmlinu{x,z}.efi). However, for our purpose, new-world
+# GRUB2 bootloaders are not *yet* able to directly boot old-world kernels, so
+# we take advantage of this format difference to detect old-world systems and
+# simply chainload their bootloaders.
+if [ -e "$OS_PROBER_TMP/loong64_have_non_pe_kernel" ]; then
+	# Usually, $boot_mount/$grub_prefix/$grub_arch/core.efi contains an
+	# EFI GRUB boot image equivalent to that installed in the ESP.
+	#
+	# We use this image for chainloading from a new-world bootloader.
+	for kernpat in \
+		"/grub*/loongarch64-efi/core.efi" \
+		"/boot/grub*/loongarch64-efi/core.efi"; do
+		if echo "$kernpat" | grep -q boot/; then
+			kernbootpart="$bootpart"
+		else
+			kernbootpart="$partition"
+		fi
+		for kernfile in $(eval ls -vr "$mpoint$kernpat" 2>/dev/null); do
+			kernbasefile=$(echo "$kernfile" | sed "s!^$mpoint!!")
+			if [ -f "$kernfile" ] && [ ! -L "$kernfile" ]; then
+				kernrelfile=$kernbasefile
+				if [ "$kernbootpart" != "$partition" ]; then
+					kernrelfile="${kernrelfile#/boot}"
+				fi
+				result "$partition:$kernbootpart::$kernbasefile::; chainloader $kernrelfile"
+				exitcode=0
+				break;
+			fi
+		done
+		if [ "$exitcode" = "0" ]; then
+			break;
+		fi
+	done
+fi
+exit "$exitcode"

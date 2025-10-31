@@ -296,3 +296,12 @@ linux_mount_boot () {
 
 	mountboot="$bootpart $mounted"
 }
+
+is_efi_stub() {
+  _file=$1
+  if [ -f "$_file" ] && [ "MZ" = "$(head --bytes=2 "$_file")" ]; then
+	  return 0
+  else
+	  return 1
+  fi
+}

@@ -8,11 +8,20 @@ mpoint="$3"
 type="$4"
 
 found_item=0
+is_loong64=0
+
+# The current system from which os-prober is run is a LoongArch system.
+# Marked by 00_flag-loong64.
+if [ -e "$OS_PROBER_TMP/is_loong64" ]; then
+	is_loong64=1
+fi
 
 entry_result () {
 	if [ "$ignore_item" = 0 ] && \
 	   [ -n "$kernel" ] && \
-	   [ -e "$mpoint/$kernel" ]; then
+	   [ -e "$mpoint/$kernel" ] && ( \
+	     [ "$is_loong64" = 0 ] || is_efi_stub "$mpoint/$kernel" \
+	   ); then
 		result "$rootpart:$bootpart:$title:$kernel:$initrd:$parameters"
 		found_item=1
 	fi

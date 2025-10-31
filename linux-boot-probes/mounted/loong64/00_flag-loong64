@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. /usr/share/os-prober/common.sh
+
+# Mark the current system as a LoongArch (loong64) one.
+#
+# We use this marker to run special routines for detecting old-world kernels
+# and systems to make it possible for users to boot those systems from new-
+# world GRUB2 bootloaders.
+touch "$OS_PROBER_TMP/is_loong64"
+
+exit 1
