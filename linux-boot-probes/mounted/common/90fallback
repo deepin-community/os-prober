@@ -4,6 +4,14 @@
 . /usr/share/os-prober/common.sh
 set -e
 
+is_loong64=0
+
+# The current system from which os-prober is run is a LoongArch system.
+# Marked by 00_flag-loong64.
+if [ -e "$OS_PROBER_TMP/is_loong64" ]; then
+        is_loong64=1
+fi
+
 partition="$1"
 bootpart="$2"
 mpoint="$3"
@@ -22,6 +30,15 @@ for kernpat in /vmlinuz /vmlinux /boot/vmlinuz /boot/vmlinux "/boot/vmlinuz*" \
 	for kernfile in $(eval ls -vr "$mpoint$kernpat" 2>/dev/null); do
 		kernbasefile=$(echo "$kernfile" | sed "s!^$mpoint!!")
 		if [ -f "$kernfile" ] && [ ! -L "$kernfile" ]; then
+			# Detect if the kernel image is non-PE (non-EFI-stub).
+			# Non-EFI-stub kernels can be assumed to be old-world
+			# ones, which needs to be booted from an old-world
+			# GRUB2 bootloader (new-world GRUB2 can't yet boot
+			# old-world kernels.
+			if [ "$is_loong64" = "1" ] && ! is_efi_stub "$kernfile"; then
+				touch "$OS_PROBER_TMP/loong64_have_non_pe_kernel"
+				continue
+			fi
 			initrdname=$(echo "$kernfile" | sed "s/vmlinu[zx]/initrd\*/")
 			# Yellow Dog Linux appends .img to it.
 			initrdname1="${initrdname}.img"
